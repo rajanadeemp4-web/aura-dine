@@ -1,0 +1,2063 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aura Dine - Enterprise Restaurant Management System</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Fonts: Inter & Playfair Display -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind Config -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#fffbf0',
+              100: '#fef3c7',
+              400: '#fbbf24',
+              500: '#f59e0b',
+              600: '#d97706',
+              700: '#b45309',
+              gold: '#d4af37',
+              goldGlow: '#f3e5ab'
+            },
+            obsidian: {
+              800: '#12161f',
+              850: '#0d1017',
+              900: '#080a0f',
+              950: '#040508'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['Playfair Display', 'serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #080a0f;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #272f3f;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #d4af37;
+    }
+
+    /* Glassmorphic Effects */
+    .glass-card {
+      background: rgba(18, 22, 31, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(212, 175, 55, 0.12);
+    }
+
+    .glass-card-hover {
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .glass-card-hover:hover {
+      border-color: rgba(212, 175, 55, 0.35);
+      box-shadow: 0 10px 25px -5px rgba(212, 175, 55, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .gold-gradient-text {
+      background: linear-gradient(135deg, #fff3d1 0%, #d4af37 50%, #aa7c11 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .gold-gradient-btn {
+      background: linear-gradient(135deg, #d4af37 0%, #b45309 100%);
+      transition: all 0.2s ease;
+    }
+    .gold-gradient-btn:hover {
+      background: linear-gradient(135deg, #e5be48 0%, #c65e0b 100%);
+      box-shadow: 0 0 15px rgba(212, 175, 55, 0.35);
+    }
+
+    /* Animations */
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 8px rgba(212, 175, 55, 0.2); }
+      50% { box-shadow: 0 0 18px rgba(212, 175, 55, 0.5); }
+    }
+    .pulse-glow {
+      animation: pulseGlow 2.5s infinite;
+    }
+
+    @keyframes ticketBlink {
+      0%, 100% { border-color: rgba(239, 68, 68, 0.8); }
+      50% { border-color: rgba(239, 68, 68, 0.2); }
+    }
+    .urgent-ticket {
+      animation: ticketBlink 1.5s infinite;
+    }
+  </style>
+</head>
+<body class="h-full text-slate-200 font-sans antialiased bg-obsidian-950 flex flex-col overflow-x-hidden">
+
+  <!-- LOGIN & ROLE SELECTOR OVERLAY (MODAL) -->
+  <div id="loginModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-obsidian-950/90 backdrop-blur-md transition-opacity duration-300">
+    <div class="glass-card w-full max-w-4xl mx-4 rounded-2xl overflow-hidden shadow-2xl border border-brand-gold/20 flex flex-col md:flex-row">
+      <!-- Left Hero Panel -->
+      <div class="md:w-5/12 p-8 bg-gradient-to-br from-obsidian-900 via-obsidian-850 to-brand-900/30 flex flex-col justify-between border-b md:border-b-0 md:border-r border-slate-800/80 relative overflow-hidden">
+        <div class="absolute -right-12 -top-12 w-40 h-40 bg-brand-gold/10 rounded-full blur-2xl"></div>
+        <div class="relative z-10">
+          <div class="flex items-center space-x-3 mb-6">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-gold to-brand-700 flex items-center justify-center text-slate-950 font-bold text-xl shadow-lg">
+              <i class="fa-solid fa-crown"></i>
+            </div>
+            <span class="font-serif text-2xl font-bold tracking-wide gold-gradient-text">RAJPUT'S</span>
+          </div>
+          <p class="text-xs uppercase tracking-widest text-brand-gold/80 font-semibold mb-2">Portal Access</p>
+          <h2 class="text-2xl font-serif text-white font-semibold leading-snug">Secure System Login</h2>
+          <p class="text-sm text-slate-400 mt-3 leading-relaxed">Sign in as staff with your credentials or register your guest session for table ordering.</p>
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-slate-800/60 relative z-10 flex items-center justify-between">
+          <div class="flex items-center text-xs text-slate-400 space-x-2">
+            <i class="fa-solid fa-shield-halved text-brand-gold"></i>
+            <span>Encrypted Authentication Session</span>
+          </div>
+          <button onclick="closeLoginModal()" class="text-xs text-slate-400 hover:text-white underline">Close</button>
+        </div>
+      </div>
+
+      <!-- Right Portal Roles Grid & Auth Forms -->
+      <div class="md:w-7/12 p-6 md:p-8 flex flex-col justify-between bg-obsidian-900/80">
+        <div>
+          <!-- Role Navigation Tabs inside Modal -->
+          <div class="flex items-center justify-between mb-6 border-b border-slate-800 pb-3">
+            <div class="flex space-x-2">
+              <button onclick="switchLoginTab('staff')" id="tabBtnStaff" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-brand-gold text-slate-950 transition-all">
+                Staff Login (POS/Kitchen/Admin)
+              </button>
+              <button onclick="switchLoginTab('customer')" id="tabBtnCustomer" class="text-xs font-semibold px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all">
+                Customer Dining
+              </button>
+            </div>
+          </div>
+
+          <!-- TAB 1: STAFF LOGIN FORM -->
+          <div id="staffAuthForm" class="space-y-4">
+            <div class="space-y-1">
+              <label class="text-[11px] font-semibold text-slate-300 uppercase tracking-wider">Select Staff Role</label>
+              <select id="staffRoleSelect" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-gold">
+                <option value="pos">Waitstaff / POS Station</option>
+                <option value="kitchen">Kitchen Chef (KDS)</option>
+                <option value="admin">Manager / Admin Executive</option>
+              </select>
+            </div>
+
+            <div class="space-y-1">
+              <label class="text-[11px] font-semibold text-slate-300 uppercase tracking-wider">Employee ID</label>
+              <input type="text" id="staffIdInput" value="EMP-102" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-gold font-mono" placeholder="e.g. EMP-102">
+            </div>
+
+            <div class="space-y-1">
+              <label class="text-[11px] font-semibold text-slate-300 uppercase tracking-wider">Password</label>
+              <input type="password" id="staffPassInput" value="123456" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-gold font-mono" placeholder="••••••••">
+            </div>
+
+            <div class="p-3 bg-brand-gold/10 border border-brand-gold/20 rounded-xl text-[11px] text-slate-300 flex items-start space-x-2">
+              <i class="fa-solid fa-circle-info text-brand-gold mt-0.5"></i>
+              <span><strong>Demo Credentials:</strong> Any password works for testing (e.g. <code>123456</code>).</span>
+            </div>
+
+            <button onclick="authenticateStaff()" class="w-full gold-gradient-btn text-slate-950 font-bold py-3 rounded-xl text-xs mt-2 shadow-lg">
+              <i class="fa-solid fa-lock mr-1.5"></i> Authenticate & Enter Portal
+            </button>
+          </div>
+
+          <!-- TAB 2: CUSTOMER LOGIN / REGISTER FORM -->
+          <div id="customerAuthForm" class="space-y-4 hidden">
+            <p class="text-xs text-slate-400">Enter your details to generate your customer access session and table order ID.</p>
+            
+            <div class="grid grid-cols-2 gap-3">
+              <div class="space-y-1">
+                <label class="text-[11px] font-semibold text-slate-300 uppercase tracking-wider">Full Name</label>
+                <input type="text" id="custNameInput" value="Alex Rivera" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-gold" placeholder="John Doe">
+              </div>
+
+              <div class="space-y-1">
+                <label class="text-[11px] font-semibold text-slate-300 uppercase tracking-wider">Phone Number</label>
+                <input type="tel" id="custPhoneInput" value="+1 (555) 019-2834" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-gold font-mono" placeholder="+1 ...">
+              </div>
+            </div>
+
+            <div class="space-y-1">
+              <label class="text-[11px] font-semibold text-slate-300 uppercase tracking-wider">Table Number / Guest ID</label>
+              <select id="custTableSelect" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-gold">
+                <option value="Table 01">Table 01 (Window View)</option>
+                <option value="Table 02">Table 02 (Booth)</option>
+                <option value="Table 04" selected>Table 04 (Main Hall)</option>
+                <option value="Takeout">Takeout / Delivery</option>
+              </select>
+            </div>
+
+            <button onclick="authenticateCustomer()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-3 rounded-xl text-xs mt-2 shadow-lg transition-colors">
+              <i class="fa-solid fa-utensils mr-1.5"></i> Start Customer Session
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-6 pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-500">
+          <span>Rajput's Suite v4.0</span>
+          <span>Status: <span class="text-emerald-400 font-medium">Online</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP TOP NAVBAR -->
+  <header class="sticky top-0 z-40 bg-obsidian-900/90 backdrop-blur-md border-b border-brand-gold/15 px-4 lg:px-8 py-3 flex items-center justify-between">
+    <!-- Brand Title -->
+    <div class="flex items-center space-x-3 cursor-pointer" onclick="showLandingPage()">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-gold to-brand-700 flex items-center justify-center text-slate-950 font-bold text-base shadow-md">
+        <i class="fa-solid fa-crown"></i>
+      </div>
+      <div>
+        <h1 class="font-serif text-lg font-bold tracking-wide text-white leading-tight gold-gradient-text">RAJPUT'S RESTAURANT</h1>
+        <p class="text-[10px] text-slate-400 font-medium tracking-wider uppercase" id="currentRoleTitleDisplay">Royalty Fine Dining</p>
+      </div>
+    </div>
+
+    <!-- Center Navigation Tabs for Active Role -->
+    <nav id="roleNavContainer" class="hidden md:flex items-center space-x-1 bg-obsidian-950/80 p-1 rounded-xl border border-slate-800">
+      <!-- Nav buttons dynamically injected here based on active role -->
+    </nav>
+
+    <!-- Right Actions & User Profile Switcher -->
+    <div class="flex items-center space-x-3">
+      <!-- Main Login Button on Header -->
+      <button onclick="openLoginModal()" class="gold-gradient-btn text-slate-950 font-bold text-xs px-3.5 py-1.5 rounded-xl shadow-md flex items-center space-x-1.5">
+        <i class="fa-solid fa-right-to-bracket"></i>
+        <span>Login / Switch Portal</span>
+      </button>
+
+      <!-- Back to Landing Page Button -->
+      <button onclick="showLandingPage()" class="hidden sm:flex items-center space-x-1.5 text-xs text-brand-gold bg-brand-gold/10 hover:bg-brand-gold/20 border border-brand-gold/30 px-3 py-1.5 rounded-xl transition-all">
+        <i class="fa-solid fa-house"></i>
+        <span>Home Page</span>
+      </button>
+
+      <!-- Live Clock -->
+      <div class="hidden lg:flex flex-col text-right pr-3 border-r border-slate-800 text-xs">
+        <span id="liveTime" class="font-mono font-semibold text-slate-200">12:00 PM</span>
+        <span id="liveDate" class="text-[10px] text-slate-500">Oct 18, 2026</span>
+      </div>
+
+      <!-- Quick Notifications Badge -->
+      <div class="relative">
+        <button id="notifBtn" onclick="toggleNotifications()" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-brand-gold hover:border-slate-700 transition-colors relative">
+          <i class="fa-regular fa-bell"></i>
+          <span id="notifBadge" class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-brand-gold"></span>
+        </button>
+
+        <!-- Dropdown Notifications -->
+        <div id="notifDropdown" class="hidden absolute right-0 mt-2 w-80 glass-card rounded-xl shadow-2xl p-4 z-50 border border-brand-gold/20">
+          <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
+            <h4 class="text-xs font-semibold uppercase text-slate-400">Activity Log</h4>
+            <button onclick="clearNotifications()" class="text-[11px] text-brand-gold hover:underline">Clear</button>
+          </div>
+          <div id="notifList" class="space-y-2.5 max-h-60 overflow-y-auto pr-1 text-xs text-slate-300">
+            <!-- Dynamic Notifications -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Current Profile Quick Switcher Button -->
+      <div class="relative">
+        <button onclick="toggleUserDropdown()" class="flex items-center space-x-2.5 bg-obsidian-850 hover:bg-slate-800 border border-slate-800 px-3 py-1.5 rounded-xl transition-all">
+          <div id="userAvatar" class="w-7 h-7 rounded-lg bg-brand-gold/20 text-brand-gold flex items-center justify-center font-bold text-xs">
+            R
+          </div>
+          <div class="text-left hidden sm:block">
+            <p id="userNameDisplay" class="text-xs font-semibold text-white leading-tight">Rajput Guest</p>
+            <p id="userRoleBadge" class="text-[10px] text-brand-gold/80 capitalize">Welcome</p>
+          </div>
+          <i class="fa-solid fa-chevron-down text-[10px] text-slate-500 ml-1"></i>
+        </button>
+
+        <!-- Role Quick Switch Dropdown -->
+        <div id="userDropdown" class="hidden absolute right-0 mt-2 w-52 glass-card rounded-xl shadow-2xl p-2 z-50 border border-brand-gold/20 text-xs">
+          <div class="px-3 py-2 border-b border-slate-800 mb-1">
+            <p class="text-slate-400 text-[10px] uppercase font-semibold">Switch Operational View</p>
+          </div>
+          <button onclick="showLandingPage(); toggleUserDropdown()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800/70 text-slate-200 flex items-center justify-between">
+            <span><i class="fa-solid fa-house mr-2 text-brand-gold"></i> Main Website Landing</span>
+          </button>
+          <button onclick="loginAs('customer'); toggleUserDropdown()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800/70 text-slate-200 flex items-center justify-between">
+            <span><i class="fa-solid fa-utensils mr-2 text-emerald-400"></i> Customer Self-Order</span>
+          </button>
+          <button onclick="loginAs('pos'); toggleUserDropdown()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800/70 text-slate-200 flex items-center justify-between">
+            <span><i class="fa-solid fa-cash-register mr-2 text-blue-400"></i> Waitstaff / POS</span>
+          </button>
+          <button onclick="loginAs('kitchen'); toggleUserDropdown()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800/70 text-slate-200 flex items-center justify-between">
+            <span><i class="fa-solid fa-fire-burner mr-2 text-amber-400"></i> Kitchen KDS</span>
+          </button>
+          <button onclick="loginAs('admin'); toggleUserDropdown()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800/70 text-slate-200 flex items-center justify-between">
+            <span><i class="fa-solid fa-chart-pie mr-2 text-purple-400"></i> Manager Admin</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Bottom/Top Nav Bar -->
+  <div class="md:hidden bg-obsidian-900 border-b border-slate-800 px-3 py-2 flex items-center justify-around text-xs" id="mobileRoleNav">
+    <!-- Injected dynamically -->
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+  <!-- ========================================== -->
+  <!-- MAIN CONTENT MODULE CONTAINERS             -->
+  <!-- ========================================== -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 space-y-8">
+
+    <!-- ======================================== -->
+    <!-- MODULE 0: HOME LANDING PAGE              -->
+    <!-- ======================================== -->
+    <div id="landingModule" class="role-module space-y-12">
+      <!-- Hero Banner Advertisement -->
+      <section class="relative rounded-3xl overflow-hidden glass-card border-brand-gold/30 min-h-[460px] flex items-center justify-center p-6 lg:p-12 text-center">
+        <!-- Background Overlay Image -->
+        <div class="absolute inset-0 z-0 opacity-25 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1600&q=80');"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-obsidian-950 via-obsidian-950/70 to-transparent z-0"></div>
+
+        <div class="relative z-10 max-w-3xl space-y-6">
+          <div class="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-brand-gold/10 border border-brand-gold/30 text-brand-gold text-xs font-semibold uppercase tracking-widest">
+            <i class="fa-solid fa-crown text-xs"></i>
+            <span>Experience Royal Culinary Legacy</span>
+          </div>
+
+          <h1 class="text-4xl sm:text-6xl font-serif font-bold text-white leading-tight">
+            Welcome to <span class="gold-gradient-text block mt-1">Rajput's Restaurant</span>
+          </h1>
+
+          <p class="text-slate-300 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto">
+            Indulge in an exquisite feast fit for royalty. Rajput's brings centuries-old heritage recipes combined with modern culinary finesse, organic spices, and majestic ambiance.
+          </p>
+
+          <div class="flex flex-wrap items-center justify-center gap-4 pt-2">
+            <button onclick="loginAs('customer')" class="gold-gradient-btn px-8 py-3.5 rounded-xl text-slate-950 font-bold text-sm shadow-xl flex items-center space-x-2">
+              <i class="fa-solid fa-utensils"></i>
+              <span>Order Online & Book Table</span>
+            </button>
+
+            <button onclick="scrollToSection('featuredDishes')" class="bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 px-6 py-3.5 rounded-xl text-white font-semibold text-sm transition-colors flex items-center space-x-2">
+              <i class="fa-solid fa-eye text-brand-gold"></i>
+              <span>Explore Chef Specialties</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Key Advertisement Highlights -->
+      <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="glass-card rounded-2xl p-6 border-slate-800 flex items-start space-x-4">
+          <div class="w-12 h-12 rounded-2xl bg-brand-gold/10 border border-brand-gold/30 text-brand-gold flex items-center justify-center text-xl shrink-0">
+            <i class="fa-solid fa-pepper-hot"></i>
+          </div>
+          <div>
+            <h3 class="font-serif font-bold text-white text-base">Authentic Spices</h3>
+            <p class="text-xs text-slate-400 mt-1">Hand-selected organic spices ground daily according to secret royal recipes.</p>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-6 border-slate-800 flex items-start space-x-4">
+          <div class="w-12 h-12 rounded-2xl bg-brand-gold/10 border border-brand-gold/30 text-brand-gold flex items-center justify-center text-xl shrink-0">
+            <i class="fa-solid fa-wine-glass"></i>
+          </div>
+          <div>
+            <h3 class="font-serif font-bold text-white text-base">Royal Ambiance</h3>
+            <p class="text-xs text-slate-400 mt-1">Immerse yourself in opulent dining rooms crafted for memorable celebrations.</p>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-6 border-slate-800 flex items-start space-x-4">
+          <div class="w-12 h-12 rounded-2xl bg-brand-gold/10 border border-brand-gold/30 text-brand-gold flex items-center justify-center text-xl shrink-0">
+            <i class="fa-solid fa-bolt"></i>
+          </div>
+          <div>
+            <h3 class="font-serif font-bold text-white text-base">Instant Smart QR</h3>
+            <p class="text-xs text-slate-400 mt-1">Order directly from your table or book reservations seamlessly online.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Featured Food Items Showcase Section -->
+      <section id="featuredDishes" class="space-y-6">
+        <div class="text-center max-w-xl mx-auto space-y-2">
+          <span class="text-xs font-semibold uppercase tracking-widest text-brand-gold">Signature Creations</span>
+          <h2 class="text-3xl font-serif font-bold text-white">Popular Delicacies at Rajput's</h2>
+          <p class="text-xs text-slate-400">Handcrafted by Master Chef Marco and his culinary team using premium cuts and fresh produce.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Dish Card 1 -->
+          <div class="glass-card rounded-2xl overflow-hidden glass-card-hover group border border-slate-800">
+            <div class="h-48 overflow-hidden relative">
+              <img src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80" alt="Royal Wagyu Filet" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+              <span class="absolute top-3 right-3 text-[10px] font-bold uppercase tracking-wider text-slate-950 bg-brand-gold px-2.5 py-1 rounded-full shadow-md">Chef Choice</span>
+            </div>
+            <div class="p-5 space-y-3">
+              <div class="flex justify-between items-center">
+                <h3 class="font-serif font-bold text-white text-lg">Royal Wagyu Ribeye</h3>
+                <span class="font-mono font-bold text-brand-gold text-base">$68.00</span>
+              </div>
+              <p class="text-xs text-slate-400 line-clamp-2">Aged Japanese Wagyu beef served with saffron truffle mashed potatoes and rich reduction glaze.</p>
+              <button onclick="loginAs('customer')" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-white py-2.5 rounded-xl font-semibold transition-colors flex items-center justify-center">
+                <span>Order Dispatched Online</span>
+                <i class="fa-solid fa-arrow-right ml-2 text-[10px] text-brand-gold"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Dish Card 2 -->
+          <div class="glass-card rounded-2xl overflow-hidden glass-card-hover group border border-slate-800">
+            <div class="h-48 overflow-hidden relative">
+              <img src="https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=800&q=80" alt="Saffron Dum Biryani" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+              <span class="absolute top-3 right-3 text-[10px] font-bold uppercase tracking-wider text-slate-950 bg-brand-gold px-2.5 py-1 rounded-full shadow-md">Must Try</span>
+            </div>
+            <div class="p-5 space-y-3">
+              <div class="flex justify-between items-center">
+                <h3 class="font-serif font-bold text-white text-lg">Rajput Special Biryani</h3>
+                <span class="font-mono font-bold text-brand-gold text-base">$38.50</span>
+              </div>
+              <p class="text-xs text-slate-400 line-clamp-2">Slow dum-cooked basmati rice with tender spiced lamb, Kashmiri saffron, and roasted cashews.</p>
+              <button onclick="loginAs('customer')" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-white py-2.5 rounded-xl font-semibold transition-colors flex items-center justify-center">
+                <span>Order Dispatched Online</span>
+                <i class="fa-solid fa-arrow-right ml-2 text-[10px] text-brand-gold"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Dish Card 3 -->
+          <div class="glass-card rounded-2xl overflow-hidden glass-card-hover group border border-slate-800">
+            <div class="h-48 overflow-hidden relative">
+              <img src="https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=800&q=80" alt="Chocolate Sphere Dessert" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+              <span class="absolute top-3 right-3 text-[10px] font-bold uppercase tracking-wider text-slate-950 bg-brand-gold px-2.5 py-1 rounded-full shadow-md">Sweet Royalty</span>
+            </div>
+            <div class="p-5 space-y-3">
+              <div class="flex justify-between items-center">
+                <h3 class="font-serif font-bold text-white text-lg">Golden Heritage Sphere</h3>
+                <span class="font-mono font-bold text-brand-gold text-base">$19.00</span>
+              </div>
+              <p class="text-xs text-slate-400 line-clamp-2">Valrhona dark chocolate dome melted live with hot hazelnut ganache over salted caramel gelato.</p>
+              <button onclick="loginAs('customer')" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-white py-2.5 rounded-xl font-semibold transition-colors flex items-center justify-center">
+                <span>Order Dispatched Online</span>
+                <i class="fa-solid fa-arrow-right ml-2 text-[10px] text-brand-gold"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- About Restaurant & Legacy Section -->
+      <section class="glass-card rounded-3xl p-8 lg:p-12 border-slate-800 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div class="lg:col-span-6 space-y-4">
+          <span class="text-xs font-semibold uppercase tracking-widest text-brand-gold">Our Heritage & Story</span>
+          <h2 class="text-3xl lg:text-4xl font-serif font-bold text-white leading-tight">Centuries of Flavors, Crafted for Royal Feasts</h2>
+          <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
+            Founded with a passion for preserving royal dining traditions, Rajput's Restaurant blends rich royal legacy with state-of-the-art kitchen automation. Every single plate served represents a harmonious balance of pristine quality ingredients, precise temperatures, and artistic presentation.
+          </p>
+
+          <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-800">
+            <div>
+              <p class="text-2xl font-serif font-bold gold-gradient-text">15+ Years</p>
+              <p class="text-[11px] text-slate-400 mt-1">Culinary Excellence</p>
+            </div>
+            <div>
+              <p class="text-2xl font-serif font-bold gold-gradient-text">100k+ Guests</p>
+              <p class="text-[11px] text-slate-400 mt-1">Served Nationally</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-6 grid grid-cols-2 gap-3">
+          <img src="https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=600&q=80" alt="Restaurant Interior" class="rounded-2xl object-cover h-48 w-full border border-slate-800">
+          <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=600&q=80" alt="Chef Plating" class="rounded-2xl object-cover h-48 w-full border border-slate-800">
+        </div>
+      </section>
+
+      <!-- Customer Testimonials & Location Info -->
+      <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="glass-card rounded-2xl p-6 border-slate-800 lg:col-span-2 space-y-4">
+          <h3 class="font-serif font-bold text-white text-xl">Guest Testimonials</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800/80 space-y-2">
+              <div class="flex text-amber-400 text-xs">
+                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+              </div>
+              <p class="text-xs text-slate-300 italic">"The Rajput Special Biryani and Wagyu Ribeye were out of this world. Flawless atmosphere!"</p>
+              <p class="text-[11px] text-brand-gold font-semibold">- Lord Sterling, Food Critic</p>
+            </div>
+
+            <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800/80 space-y-2">
+              <div class="flex text-amber-400 text-xs">
+                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+              </div>
+              <p class="text-xs text-slate-300 italic">"Ordering right from our table via QR was smooth and the kitchen served us in under 12 minutes."</p>
+              <p class="text-[11px] text-brand-gold font-semibold">- Sophia & Family</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-6 border-slate-800 space-y-3">
+          <h3 class="font-serif font-bold text-white text-xl">Visit Rajput's</h3>
+          <p class="text-xs text-slate-400"><i class="fa-solid fa-location-dot text-brand-gold mr-2"></i> 100 Culinary Blvd, Suite 400</p>
+          <p class="text-xs text-slate-400"><i class="fa-solid fa-phone text-brand-gold mr-2"></i> +1 (800) 555-RAJPUT</p>
+          <p class="text-xs text-slate-400"><i class="fa-solid fa-clock text-brand-gold mr-2"></i> Open Daily: 11:00 AM - 11:30 PM</p>
+          
+          <button onclick="loginAs('customer')" class="w-full gold-gradient-btn text-slate-950 font-bold py-3 rounded-xl text-xs mt-3">
+            Book Table Reservation Now
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <!-- MODULE 1: CUSTOMER VIEW -->
+    <div id="customerModule" class="role-module hidden space-y-6">
+      <!-- Customer Portal Sub Navigation -->
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div class="flex items-center space-x-2 overflow-x-auto">
+          <button id="custBtnMenu" onclick="showCustomerTab('menu')" class="px-4 py-2 rounded-xl text-xs font-bold bg-brand-gold text-slate-950 transition-all">
+            <i class="fa-solid fa-utensils mr-1.5"></i> Dine-In Menu
+          </button>
+          <button id="custBtnDelivery" onclick="showCustomerTab('delivery')" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white bg-slate-900 border border-slate-800 transition-all">
+            <i class="fa-solid fa-truck-ramblin mr-1.5"></i> Order for Delivery
+          </button>
+          <button id="custBtnReservations" onclick="showCustomerTab('reservations')" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white bg-slate-900 border border-slate-800 transition-all">
+            <i class="fa-solid fa-calendar-check mr-1.5"></i> Reserve Table
+          </button>
+          <button id="custBtnOrders" onclick="showCustomerTab('orders')" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white bg-slate-900 border border-slate-800 relative transition-all">
+            <i class="fa-solid fa-clock-rotate-left mr-1.5"></i> My Live Orders
+            <span id="custActiveBadge" class="hidden absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB A: DIGITAL MENU & ORDERING -->
+      <div id="custTabMenu" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Left Categories & Search + Items Grid (8 cols) -->
+        <div class="lg:col-span-8 space-y-4">
+          <!-- Search & Filter Controls -->
+          <div class="flex flex-col sm:flex-row gap-3 justify-between items-center bg-obsidian-900/90 p-3 rounded-2xl border border-slate-800">
+            <div class="relative w-full sm:w-64">
+              <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-slate-500"></i>
+              <input type="text" id="menuSearchInput" onkeyup="renderCustomerMenu()" placeholder="Search dishes, spices..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-brand-gold">
+            </div>
+            <div class="flex items-center space-x-1.5 overflow-x-auto w-full sm:w-auto" id="menuCategoryTabs">
+              <!-- Dynamically filled categories -->
+            </div>
+          </div>
+
+          <!-- Dishes Cards Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="customerMenuGrid">
+            <!-- Dynamic food cards -->
+          </div>
+        </div>
+
+        <!-- Right Live Cart / Table Checkout Summary (4 cols) -->
+        <div class="lg:col-span-4">
+          <div class="glass-card rounded-2xl p-5 border border-brand-gold/20 space-y-4 sticky top-20">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div>
+                <h3 id="cartHeaderTitle" class="font-serif font-bold text-white text-base">Table 04 Session</h3>
+                <p id="cartHeaderSub" class="text-[10px] text-slate-400">Order directly to kitchen KDS</p>
+              </div>
+              <span id="cartHeaderBadge" class="text-xs font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold">Active Session</span>
+            </div>
+
+            <!-- Cart Items List -->
+            <div class="space-y-2.5 max-h-60 overflow-y-auto pr-1" id="cartItemList">
+              <!-- Cart Items Injected Dynamically -->
+            </div>
+
+            <!-- Tip & Bill Summary -->
+            <div class="border-t border-slate-800 pt-3 space-y-2 text-xs">
+              <div class="flex items-center justify-between text-slate-400">
+                <span>Add Tip:</span>
+                <div class="flex space-x-1">
+                  <button onclick="setTip(10)" class="px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-[10px] text-slate-300 hover:border-brand-gold">10%</button>
+                  <button onclick="setTip(15)" class="px-2 py-0.5 rounded bg-brand-gold text-slate-950 text-[10px] font-bold">15%</button>
+                  <button onclick="setTip(20)" class="px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-[10px] text-slate-300 hover:border-brand-gold">20%</button>
+                </div>
+              </div>
+              <div class="flex justify-between text-slate-400">
+                <span>Subtotal</span>
+                <span id="cartSubtotal" class="font-mono text-white">$0.00</span>
+              </div>
+              <div class="flex justify-between text-slate-400">
+                <span>Tax (8.25%)</span>
+                <span id="cartTax" class="font-mono text-white">$0.00</span>
+              </div>
+              <div class="flex justify-between font-bold text-white text-sm pt-2 border-t border-slate-800">
+                <span>Total Due</span>
+                <span id="cartTotal" class="font-mono text-brand-gold">$0.00</span>
+              </div>
+            </div>
+
+            <button onclick="submitCustomerOrder()" class="w-full gold-gradient-btn text-slate-950 font-bold py-3 rounded-xl text-xs shadow-lg flex items-center justify-center space-x-2">
+              <i class="fa-solid fa-paper-plane"></i>
+              <span id="cartSubmitBtnText">Send Order to Kitchen</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB B: DELIVERY ORDERING PORTAL -->
+      <div id="custTabDelivery" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Delivery Items Showcase (8 cols) -->
+        <div class="lg:col-span-8 space-y-4">
+          <div class="p-4 bg-slate-900/80 border border-slate-800 rounded-2xl flex items-center justify-between">
+            <div>
+              <h3 class="font-serif font-bold text-white text-base">Items Available for Express Delivery</h3>
+              <p class="text-xs text-slate-400">Carefully packaged in temperature-controlled royal eco-friendly boxes.</p>
+            </div>
+            <span class="text-xs text-emerald-400 font-semibold bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+              <i class="fa-solid fa-truck-fast mr-1"></i> Delivery Time ~ 30-45 mins
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="deliveryMenuGrid">
+            <!-- Dynamic Delivery Items -->
+          </div>
+        </div>
+
+        <!-- Delivery Address & Checkout (4 cols) -->
+        <div class="lg:col-span-4">
+          <div class="glass-card rounded-2xl p-5 border border-slate-800 space-y-4 sticky top-20">
+            <h3 class="font-serif font-bold text-white text-base border-b border-slate-800 pb-2">Delivery Details</h3>
+            
+            <div class="space-y-3 text-xs">
+              <div class="space-y-1">
+                <label class="text-[10px] font-semibold text-slate-400 uppercase">Delivery Address</label>
+                <input type="text" id="delAddress" value="742 Evergreen Terrace, Suite 4B" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-brand-gold">
+              </div>
+
+              <div class="space-y-1">
+                <label class="text-[10px] font-semibold text-slate-400 uppercase">Contact Phone Number</label>
+                <input type="tel" id="delPhone" value="+1 (555) 019-2834" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-brand-gold font-mono">
+              </div>
+
+              <div class="space-y-1">
+                <label class="text-[10px] font-semibold text-slate-400 uppercase">Delivery Instructions / Notes</label>
+                <textarea id="delNotes" rows="2" placeholder="Leave at doorstep, ring bell..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-brand-gold"></textarea>
+              </div>
+            </div>
+
+            <div class="p-3 bg-brand-gold/10 border border-brand-gold/20 rounded-xl text-[11px] text-slate-300 flex items-center space-x-2">
+              <i class="fa-solid fa-shield-cat text-brand-gold"></i>
+              <span>Free delivery on orders over $50.00!</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB C: TABLE RESERVATION FORM -->
+      <div id="custTabReservations" class="hidden max-w-xl mx-auto glass-card rounded-2xl p-6 border border-slate-800 space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <h3 class="font-serif font-bold text-white text-xl">Pre-Book a Royal Dining Table</h3>
+          <span class="text-xs text-brand-gold bg-brand-gold/10 border border-brand-gold/20 px-2.5 py-1 rounded-full"><i class="fa-solid fa-crown mr-1"></i> VIP Seating</span>
+        </div>
+        <p class="text-xs text-slate-400">Pre-reserve your table for special occasions, corporate dinners, or weekend feasts with immediate confirmation.</p>
+        
+        <form onsubmit="handleReservationSubmit(event)" class="space-y-4 pt-2">
+          <div class="space-y-1">
+            <label class="text-[11px] font-semibold text-slate-300 uppercase">Guest Name</label>
+            <input type="text" id="resName" required value="Alex Rivera" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-gold">
+          </div>
+          
+          <div class="grid grid-cols-2 gap-3">
+            <div class="space-y-1">
+              <label class="text-[11px] font-semibold text-slate-300 uppercase">Guests Count</label>
+              <select id="resGuests" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-gold">
+                <option value="2">2 Guests (Couple)</option>
+                <option value="4" selected>4 Guests (Family)</option>
+                <option value="6">6 Guests (Party)</option>
+                <option value="8">8+ Guests (Royal Feast)</option>
+              </select>
+            </div>
+
+            <div class="space-y-1">
+              <label class="text-[11px] font-semibold text-slate-300 uppercase">Preferred Seating Area</label>
+              <select id="resSeatingArea" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-gold">
+                <option value="Main Dining Hall">Main Dining Hall</option>
+                <option value="Window View Lounge">Window View Lounge</option>
+                <option value="Private VIP Dining Room">Private VIP Dining Room</option>
+                <option value="Outdoor Terrace">Outdoor Terrace</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div class="space-y-1">
+              <label class="text-[11px] font-semibold text-slate-300 uppercase">Reservation Date</label>
+              <input type="date" id="resDate" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-gold font-mono">
+            </div>
+
+            <div class="space-y-1">
+              <label class="text-[11px] font-semibold text-slate-300 uppercase">Reservation Time</label>
+              <input type="time" id="resTime" value="19:30" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-gold font-mono">
+            </div>
+          </div>
+
+          <div class="space-y-1">
+            <label class="text-[11px] font-semibold text-slate-300 uppercase">Special Dietary or Seating Notes</label>
+            <input type="text" id="resSpecialNotes" placeholder="Anniversary, birthday cake needed, quiet table..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-gold">
+          </div>
+
+          <button type="submit" class="w-full gold-gradient-btn text-slate-950 font-bold py-3.5 rounded-xl text-xs shadow-lg flex items-center justify-center space-x-2">
+            <i class="fa-solid fa-calendar-check"></i>
+            <span>Confirm & Lock Table Reservation</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- TAB D: MY LIVE ORDERS FEED -->
+      <div id="custTabOrders" class="hidden max-w-2xl mx-auto space-y-4">
+        <h3 class="font-serif font-bold text-white text-xl">Real-Time Order & Reservation Tracker</h3>
+        <div id="customerLiveOrdersList" class="space-y-3">
+          <!-- Dynamic Order Status List -->
+        </div>
+      </div>
+    </div>
+
+    <!-- MODULE 2: WAITSTAFF / POS MODULE -->
+    <div id="posModule" class="role-module hidden space-y-6">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div>
+          <h2 class="text-2xl font-serif text-white font-bold">Waitstaff POS & Table Floorplan</h2>
+          <p class="text-xs text-slate-400">Manage real-time seating, order billing, and ticket dispatches.</p>
+        </div>
+        <button onclick="resetPosSelection()" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-1.5 rounded-xl border border-slate-700 text-slate-300">
+          <i class="fa-solid fa-rotate-left mr-1"></i> Reset Floor Selection
+        </button>
+      </div>
+
+      <!-- Floorplan Grid & Quick POS Terminal -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Floor Map (7 cols) -->
+        <div class="lg:col-span-7 glass-card rounded-2xl p-5 border border-slate-800 space-y-4">
+          <h3 class="font-semibold text-white text-sm">Restaurant Floor Layout</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="floorMapGrid">
+            <!-- Dynamic Tables Injected Here -->
+          </div>
+        </div>
+
+        <!-- POS Table Billing Panel (5 cols) -->
+        <div class="lg:col-span-5 glass-card rounded-2xl p-5 border border-slate-800 flex flex-col justify-between space-y-4">
+          <div class="space-y-3">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+              <h3 id="posSelectedTableTitle" class="font-serif font-bold text-white text-base">Table 01 Selection</h3>
+              <span id="posTableStatusBadge" class="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">Occupied</span>
+            </div>
+
+            <!-- Quick Add Item Selector -->
+            <div>
+              <label class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1.5">Quick Menu Dispatch</label>
+              <div class="grid grid-cols-2 gap-2" id="posQuickItemGrid">
+                <!-- Injected Menu Buttons -->
+              </div>
+            </div>
+
+            <!-- Active Table Order Items -->
+            <div class="border-t border-slate-800 pt-3">
+              <p class="text-xs font-semibold text-white mb-2">Current Order Items</p>
+              <div id="posTableItemsList" class="space-y-2 max-h-40 overflow-y-auto pr-1 text-xs text-slate-300">
+                <p class="text-slate-500 italic text-center py-4">Select a table and items to start billing</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- POS Actions & Receipt Split -->
+          <div class="border-t border-slate-800 pt-4 space-y-3">
+            <div class="flex justify-between items-center text-sm font-bold text-white">
+              <span>Bill Subtotal</span>
+              <span id="posBillTotal" class="text-brand-gold font-mono">$0.00</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="dispatchPosOrder()" class="gold-gradient-btn text-slate-950 font-bold py-2.5 rounded-xl text-xs">
+                <i class="fa-solid fa-paper-plane mr-1"></i> Send to KDS
+              </button>
+              <button onclick="openReceiptModal()" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2.5 rounded-xl text-xs border border-slate-700">
+                <i class="fa-solid fa-receipt mr-1 text-brand-gold"></i> Print / Split Bill
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODULE 3: KITCHEN DISPLAY SYSTEM (KDS) -->
+    <div id="kitchenModule" class="role-module hidden space-y-6">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div>
+          <h2 class="text-2xl font-serif text-white font-bold">Kitchen Display System (KDS)</h2>
+          <p class="text-xs text-slate-400">Live active tickets dispatched from customer portal and waitstaff POS.</p>
+        </div>
+        <span id="kdsTicketCount" class="text-xs font-mono font-bold bg-brand-gold/10 text-brand-gold border border-brand-gold/30 px-3 py-1.5 rounded-xl">0 Active Tickets</span>
+      </div>
+
+      <div id="kdsTicketsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Live Tickets Injected Dynamically -->
+      </div>
+    </div>
+
+    <!-- MODULE 4: MANAGER / ADMIN DASHBOARD -->
+    <div id="adminModule" class="role-module hidden space-y-6">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div>
+          <h2 class="text-2xl font-serif text-white font-bold">Manager Executive Dashboard</h2>
+          <p class="text-xs text-slate-400">Real-time revenue analytics, inventory control, and menu management.</p>
+        </div>
+        <button onclick="toggleAddMenuModal()" class="gold-gradient-btn text-slate-950 text-xs font-bold px-4 py-2 rounded-xl shadow-md flex items-center space-x-1.5">
+          <i class="fa-solid fa-plus"></i>
+          <span>Add New Menu Item</span>
+        </button>
+      </div>
+
+      <!-- KPI Metrics Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="glass-card rounded-2xl p-5 border-slate-800 space-y-1">
+          <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Total Sales Revenue</p>
+          <p id="adminMetricRevenue" class="text-2xl font-mono font-bold text-brand-gold">$2,845.50</p>
+          <p class="text-[10px] text-emerald-400 font-semibold"><i class="fa-solid fa-arrow-trend-up mr-1"></i> +14.2% from yesterday</p>
+        </div>
+
+        <div class="glass-card rounded-2xl p-5 border-slate-800 space-y-1">
+          <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Total Orders Processed</p>
+          <p id="adminMetricOrders" class="text-2xl font-mono font-bold text-white">68</p>
+          <p class="text-[10px] text-emerald-400 font-semibold"><i class="fa-solid fa-check mr-1"></i> 100% fulfill rate</p>
+        </div>
+
+        <div class="glass-card rounded-2xl p-5 border-slate-800 space-y-1">
+          <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Active Tables Seated</p>
+          <p class="text-2xl font-mono font-bold text-amber-400">2 / 6</p>
+          <p class="text-[10px] text-slate-400 font-semibold">Average dwell: 48 mins</p>
+        </div>
+
+        <div class="glass-card rounded-2xl p-5 border-slate-800 space-y-1">
+          <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">System Operational Status</p>
+          <p class="text-2xl font-mono font-bold text-emerald-400">Optimal</p>
+          <p class="text-[10px] text-emerald-400 font-semibold"><i class="fa-solid fa-wifi mr-1"></i> KDS Sync Online</p>
+        </div>
+      </div>
+
+      <!-- Charts & Inventory Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Sales Chart Section (7 cols) -->
+        <div class="lg:col-span-7 glass-card rounded-2xl p-5 border-slate-800 space-y-4">
+          <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+            <h3 class="font-semibold text-white text-sm">Hourly Sales Velocity ($)</h3>
+            <span class="text-[10px] text-slate-400 font-mono">Today's Performance</span>
+          </div>
+          <div id="adminRevenueChart" class="h-48 flex items-end space-x-3 pt-6 border-b border-slate-800">
+            <!-- Dynamic Bar Chart Bars Injected -->
+          </div>
+        </div>
+
+        <!-- Inventory Monitor Panel (5 cols) -->
+        <div class="lg:col-span-5 glass-card rounded-2xl p-5 border-slate-800 space-y-4 flex flex-col justify-between">
+          <div>
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-3">
+              <h3 class="font-semibold text-white text-sm">Pantry & Raw Ingredient Stock</h3>
+              <button onclick="triggerInventoryRestock()" class="text-[10px] text-brand-gold hover:underline font-semibold">Replenish All</button>
+            </div>
+            <div id="adminInventoryList" class="space-y-2.5 max-h-52 overflow-y-auto pr-1">
+              <!-- Inventory Items -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Menu Items Management Table -->
+      <div class="glass-card rounded-2xl p-5 border-slate-800 space-y-4">
+        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+          <h3 class="font-semibold text-white text-sm">Live Menu Catalog Management</h3>
+          <span class="text-xs text-slate-400">Toggle availability or edit pricing</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr class="border-b border-slate-800 text-slate-400 uppercase text-[10px] font-semibold">
+                <th class="p-3">Dish Name</th>
+                <th class="p-3">Category</th>
+                <th class="p-3">Price</th>
+                <th class="p-3">Status</th>
+                <th class="p-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminMenuTableBody" class="divide-y divide-slate-800/60">
+              <!-- Dynamic Rows Injected -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- RECEIPT / SPLIT BILL MODAL -->
+  <div id="receiptModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-obsidian-950/80 backdrop-blur-sm">
+    <div class="glass-card w-full max-w-md mx-4 rounded-2xl p-6 space-y-4 border border-brand-gold/30">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h3 class="font-serif font-bold text-white text-lg">Bill Receipt & Checkout</h3>
+        <button onclick="closeReceiptModal()" class="text-slate-400 hover:text-white text-sm"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <!-- Receipt Content Simulation -->
+      <div id="receiptPrintArea" class="bg-white text-slate-900 font-mono p-4 rounded-xl text-xs space-y-3 shadow-inner">
+        <div class="text-center border-b border-dashed border-slate-300 pb-2">
+          <h4 class="font-bold text-sm text-black">RAJPUT'S RESTAURANT</h4>
+          <p class="text-[10px] text-slate-500">Royalty Fine Dining & Cuisine</p>
+          <p class="text-[10px] text-slate-500" id="recTableNum">Table 01</p>
+        </div>
+
+        <div id="recItemsList" class="space-y-1 text-[11px]">
+          <!-- Receipt items inserted here -->
+        </div>
+
+        <div class="border-t border-dashed border-slate-300 pt-2 space-y-1 text-right text-[11px]">
+          <div class="flex justify-between"><span>Subtotal:</span> <span id="recSubtotal">$0.00</span></div>
+          <div class="flex justify-between"><span>Tax (8.25%):</span> <span id="recTax">$0.00</span></div>
+          <div class="flex justify-between font-bold text-sm text-black pt-1"><span>Total Due:</span> <span id="recTotal">$0.00</span></div>
+        </div>
+
+        <!-- Bill Split Calculator Section -->
+        <div class="bg-slate-100 p-3 rounded-lg border border-slate-200 mt-3 text-slate-800">
+          <span class="font-sans text-[10px] font-bold uppercase text-slate-500 block mb-1">Split Bill Calculator</span>
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold">Split between:</span>
+            <div class="flex items-center space-x-2">
+              <button onclick="adjustSplit(-1)" class="w-5 h-5 bg-slate-300 text-black font-bold rounded flex items-center justify-center">-</button>
+              <span id="splitCount" class="font-bold text-xs">1</span>
+              <button onclick="adjustSplit(1)" class="w-5 h-5 bg-slate-300 text-black font-bold rounded flex items-center justify-center">+</button>
+            </div>
+          </div>
+          <div class="flex justify-between text-xs font-bold text-brand-700 mt-2 pt-2 border-t border-slate-300">
+            <span>Per Person:</span>
+            <span id="splitAmount" class="font-mono">$0.00</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex space-x-2 pt-2">
+        <button onclick="simulatePrintReceipt()" class="flex-1 gold-gradient-btn text-slate-950 font-bold py-2.5 rounded-xl text-xs">
+          <i class="fa-solid fa-print mr-1"></i> Print Receipt
+        </button>
+        <button onclick="closeReceiptModal()" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold px-4 py-2.5 rounded-xl text-xs border border-slate-700">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- JAVASCRIPT LOGIC                           -->
+  <!-- ========================================== -->
+  <script>
+    // ------------------------------------------
+    // MOCK DATA & APP INITIAL STATE
+    // ------------------------------------------
+    let currentRole = 'landing'; // landing | customer | pos | kitchen | admin
+    let selectedCategory = 'all';
+    let customerCart = [];
+    let activeTipPercent = 15;
+    let orderTypeMode = 'dine-in'; // 'dine-in' or 'delivery'
+    let selectedPosTableId = 1;
+    let splitPeopleCount = 1;
+    let totalRevenue = 2845.50;
+    let totalOrdersCount = 68;
+
+    let customerReservations = []; // Pre-booked table reservations
+
+    const rolesConfig = {
+      landing: { name: 'Rajput Guest', roleTitle: 'Royalty Fine Dining' },
+      customer: { name: 'Alex Rivera', roleTitle: 'Guest Session' },
+      pos: { name: 'Staff POS Station', roleTitle: 'Waitstaff Terminal' },
+      kitchen: { name: 'Chef Marco', roleTitle: 'Head Chef KDS' },
+      admin: { name: 'Manager Executive', roleTitle: 'Admin & Analytics' }
+    };
+
+    let menuItems = [
+      { id: 1, name: 'Royal Wagyu Ribeye', category: 'mains', price: 68.00, tag: "Chef's Choice", desc: 'Aged Japanese Wagyu beef served with saffron truffle mashed potatoes and rich reduction glaze.', available: true, deliveryAvailable: true },
+      { id: 2, name: 'Rajput Special Biryani', category: 'mains', price: 38.50, tag: 'Must Try', desc: 'Slow dum-cooked basmati rice with tender spiced lamb, Kashmiri saffron, and roasted cashews.', available: true, deliveryAvailable: true },
+      { id: 3, name: 'Golden Heritage Sphere', category: 'desserts', price: 19.00, tag: 'Sweet Royalty', desc: 'Valrhona dark chocolate dome melted live with hot hazelnut ganache over salted caramel gelato.', available: true, deliveryAvailable: false }, // Dine-in only live dessert
+      { id: 4, name: 'Saffron Silk Mocktail', category: 'drinks', price: 12.50, tag: 'Signature', desc: 'Infused Kashmiri saffron, cardamom syrup, rose water, and sparkling soda.', available: true, deliveryAvailable: true },
+      { id: 5, name: 'Tandoori Truffle Naan', category: 'appetizers', price: 14.00, tag: 'Appetizer', desc: 'Hand-stretched naan brushed with black truffle butter and roasted garlic.', available: true, deliveryAvailable: true }
+    ];
+
+    let tablesData = [
+      { id: 1, name: 'Table 01', seats: 2, status: 'occupied', subtotal: 87.00 },
+      { id: 2, name: 'Table 02', seats: 4, status: 'vacant', subtotal: 0.00 },
+      { id: 3, name: 'Table 03', seats: 6, status: 'reserved', subtotal: 0.00 },
+      { id: 4, name: 'Table 04', seats: 4, status: 'occupied', subtotal: 125.50 },
+      { id: 5, name: 'Table 05', seats: 2, status: 'vacant', subtotal: 0.00 },
+      { id: 6, name: 'Table 06', seats: 8, status: 'vacant', subtotal: 0.00 }
+    ];
+
+    let kitchenOrders = [
+      {
+        id: 1041,
+        table: 'Table 01',
+        time: '12:15 PM',
+        timerSeconds: 420,
+        status: 'prepping',
+        items: [{ name: 'Royal Wagyu Ribeye', qty: 1, notes: 'Medium Rare' }, { name: 'Tandoori Truffle Naan', qty: 2, notes: 'Extra Crisp' }]
+      },
+      {
+        id: 1042,
+        table: 'Table 04',
+        time: '12:22 PM',
+        timerSeconds: 120,
+        status: 'pending',
+        items: [{ name: 'Rajput Special Biryani', qty: 2, notes: 'Spicy' }, { name: 'Saffron Silk Mocktail', qty: 2, notes: 'Less Ice' }]
+      }
+    ];
+
+    let inventoryData = [
+      { name: 'Wagyu Beef Ribeye Cut', stock: 18, min: 5, unit: 'kg' },
+      { name: 'Kashmiri Saffron', stock: 85, min: 20, unit: 'grams' },
+      { name: 'Basmati Dum Rice', stock: 45, min: 10, unit: 'kg' },
+      { name: 'Truffle Butter', stock: 3, min: 5, unit: 'jars' },
+      { name: 'Valrhona Chocolate', stock: 12, min: 4, unit: 'kg' }
+    ];
+
+    let activityLog = [
+      { time: '12:22 PM', text: 'New Order #1042 placed at Table 04' },
+      { time: '12:15 PM', text: 'Order #1041 moved to Kitchen Prep' }
+    ];
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderAppForCurrentRole();
+
+      // Set default reservation date to today
+      const resDateInput = document.getElementById('resDate');
+      if (resDateInput) {
+        const today = new Date().toISOString().split('T')[0];
+        resDateInput.value = today;
+      }
+
+      setInterval(() => {
+        const now = new Date();
+        const liveTime = document.getElementById('liveTime');
+        const liveDate = document.getElementById('liveDate');
+        if (liveTime) liveTime.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        if (liveDate) liveDate.textContent = now.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+      }, 1000);
+
+      setInterval(updateKdsTimers, 1000);
+    });
+
+    function openLoginModal() {
+      const modal = document.getElementById('loginModal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function switchLoginTab(tab) {
+      const staffBtn = document.getElementById('tabBtnStaff');
+      const custBtn = document.getElementById('tabBtnCustomer');
+      const staffForm = document.getElementById('staffAuthForm');
+      const custForm = document.getElementById('customerAuthForm');
+
+      if (tab === 'staff') {
+        staffBtn.className = 'text-xs font-bold px-3 py-1.5 rounded-lg bg-brand-gold text-slate-950 transition-all';
+        custBtn.className = 'text-xs font-semibold px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all';
+        staffForm.classList.remove('hidden');
+        custForm.classList.add('hidden');
+      } else {
+        custBtn.className = 'text-xs font-bold px-3 py-1.5 rounded-lg bg-brand-gold text-slate-950 transition-all';
+        staffBtn.className = 'text-xs font-semibold px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all';
+        custForm.classList.remove('hidden');
+        staffForm.classList.add('hidden');
+      }
+    }
+
+    function authenticateStaff() {
+      const role = document.getElementById('staffRoleSelect').value;
+      const empId = document.getElementById('staffIdInput').value;
+      const pass = document.getElementById('staffPassInput').value;
+
+      if (!empId || !pass) {
+        showToast('Please enter both Employee ID and password', 'warning');
+        return;
+      }
+
+      loginAs(role);
+      closeLoginModal();
+      showToast(`Authenticated as ${role.toUpperCase()} (${empId})`, 'success');
+      logActivity(`Staff Authenticated: ID ${empId} as ${role}`);
+    }
+
+    function authenticateCustomer() {
+      const name = document.getElementById('custNameInput').value;
+      const phone = document.getElementById('custPhoneInput').value;
+      const table = document.getElementById('custTableSelect').value;
+
+      if (!name) {
+        showToast('Please enter your name', 'warning');
+        return;
+      }
+
+      rolesConfig.customer.name = name;
+      loginAs('customer');
+      closeLoginModal();
+      showToast(`Welcome ${name}! Session created for ${table}`, 'success');
+      logActivity(`Customer Login: ${name} registered at ${table}`);
+    }
+
+    function loginAs(role) {
+      currentRole = role;
+      renderAppForCurrentRole();
+      closeLoginModal();
+    }
+
+    function showLandingPage() {
+      currentRole = 'landing';
+      renderAppForCurrentRole();
+    }
+
+    function scrollToSection(sectionId) {
+      const el = document.getElementById(sectionId);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function renderAppForCurrentRole() {
+      // Update Topbar Info
+      const conf = rolesConfig[currentRole] || rolesConfig['landing'];
+      document.getElementById('userNameDisplay').textContent = conf.name;
+      document.getElementById('userRoleBadge').textContent = currentRole.toUpperCase();
+      document.getElementById('currentRoleTitleDisplay').textContent = conf.roleTitle;
+      document.getElementById('userAvatar').textContent = conf.name.charAt(0);
+
+      // Hide all role modules
+      document.querySelectorAll('.role-module').forEach(mod => mod.classList.add('hidden'));
+
+      // Render role specific views
+      if (currentRole === 'landing') {
+        document.getElementById('landingModule').classList.remove('hidden');
+      } else if (currentRole === 'customer') {
+        document.getElementById('customerModule').classList.remove('hidden');
+        renderCustomerCategories();
+        renderCustomerMenu();
+        renderCart();
+      } else if (currentRole === 'pos') {
+        document.getElementById('posModule').classList.remove('hidden');
+        renderFloorMap();
+        renderPosQuickItems();
+      } else if (currentRole === 'kitchen') {
+        document.getElementById('kitchenModule').classList.remove('hidden');
+        renderKdsTickets();
+      } else if (currentRole === 'admin') {
+        document.getElementById('adminModule').classList.remove('hidden');
+        renderAdminDashboard();
+      }
+
+      renderRoleNavButtons();
+      renderNotifications();
+    }
+
+    function renderRoleNavButtons() {
+      const nav = document.getElementById('roleNavContainer');
+      const mobileNav = document.getElementById('mobileRoleNav');
+      
+      const rolesList = [
+        { id: 'landing', icon: 'fa-house', label: 'Home Page' },
+        { id: 'customer', icon: 'fa-utensils', label: 'Customer' },
+        { id: 'pos', icon: 'fa-cash-register', label: 'Waitstaff/POS' },
+        { id: 'kitchen', icon: 'fa-fire-burner', label: 'Kitchen KDS' },
+        { id: 'admin', icon: 'fa-chart-pie', label: 'Admin' }
+      ];
+
+      let navHtml = '';
+      rolesList.forEach(r => {
+        const activeClass = currentRole === r.id ? 'bg-brand-gold text-slate-950 font-semibold shadow-md' : 'text-slate-400 hover:text-white';
+        navHtml += `
+          <button onclick="loginAs('${r.id}')" class="px-3 py-1.5 rounded-lg text-xs flex items-center space-x-1.5 transition-all ${activeClass}">
+            <i class="fa-solid ${r.icon}"></i>
+            <span>${r.label}</span>
+          </button>
+        `;
+      });
+
+      nav.innerHTML = navHtml;
+      mobileNav.innerHTML = navHtml;
+    }
+
+    // ------------------------------------------
+    // MODULE 1: CUSTOMER LOGIC
+    // ------------------------------------------
+    function renderCustomerCategories() {
+      const categories = [
+        { id: 'all', label: 'All Items' },
+        { id: 'mains', label: 'Main Courses' },
+        { id: 'appetizers', label: 'Appetizers' },
+        { id: 'desserts', label: 'Desserts' },
+        { id: 'drinks', label: 'Drinks' }
+      ];
+
+      const container = document.getElementById('menuCategoryTabs');
+      if (!container) return;
+
+      container.innerHTML = categories.map(cat => {
+        const isSelected = selectedCategory === cat.id;
+        const activeClass = isSelected ? 'bg-brand-gold text-slate-950 font-bold' : 'bg-slate-950 text-slate-400 border border-slate-800 hover:text-white';
+        return `
+          <button onclick="selectCustomerCategory('${cat.id}')" class="px-3 py-1 rounded-xl text-xs whitespace-nowrap transition-all ${activeClass}">
+            ${cat.label}
+          </button>
+        `;
+      }).join('');
+    }
+
+    function selectCustomerCategory(catId) {
+      selectedCategory = catId;
+      renderCustomerCategories();
+      renderCustomerMenu();
+    }
+
+    function renderCustomerMenu() {
+      const grid = document.getElementById('customerMenuGrid');
+      if (!grid) return;
+
+      const searchVal = (document.getElementById('menuSearchInput')?.value || '').toLowerCase();
+
+      const filtered = menuItems.filter(item => {
+        const matchCategory = selectedCategory === 'all' || item.category === selectedCategory;
+        const matchSearch = item.name.toLowerCase().includes(searchVal) || item.desc.toLowerCase().includes(searchVal);
+        return matchCategory && matchSearch;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="col-span-2 text-center text-slate-500 py-8 italic">No dishes match your filter criteria.</div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(item => `
+        <div class="glass-card rounded-2xl p-4 flex flex-col justify-between glass-card-hover ${!item.available ? 'opacity-60' : ''}">
+          <div>
+            <div class="flex justify-between items-start mb-2">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-950 bg-brand-gold px-2 py-0.5 rounded-full">${item.tag}</span>
+              <span class="font-mono font-bold text-white text-sm">$${item.price.toFixed(2)}</span>
+            </div>
+            <h4 class="font-serif font-bold text-white text-base leading-snug">${item.name}</h4>
+            <p class="text-xs text-slate-400 mt-1 line-clamp-2">${item.desc}</p>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between">
+            <span class="text-[10px] ${item.available ? 'text-emerald-400' : 'text-red-400'}">
+              ${item.available ? '<i class="fa-solid fa-check text-[8px] mr-1"></i> Available' : 'Out of Stock'}
+            </span>
+            <button onclick="addToCart(${item.id})" ${!item.available ? 'disabled' : ''} class="gold-gradient-btn text-slate-950 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center">
+              <i class="fa-solid fa-plus mr-1"></i> Add to Order
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function showCustomerTab(tab) {
+      document.getElementById('custTabMenu').classList.add('hidden');
+      document.getElementById('custTabDelivery').classList.add('hidden');
+      document.getElementById('custTabReservations').classList.add('hidden');
+      document.getElementById('custTabOrders').classList.add('hidden');
+
+      // Update button styling tabs
+      const btnMenu = document.getElementById('custBtnMenu');
+      const btnDelivery = document.getElementById('custBtnDelivery');
+      const btnReservations = document.getElementById('custBtnReservations');
+      const btnOrders = document.getElementById('custBtnOrders');
+
+      const activeClass = "px-4 py-2 rounded-xl text-xs font-bold bg-brand-gold text-slate-950 transition-all";
+      const inactiveClass = "px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white bg-slate-900 border border-slate-800 transition-all";
+
+      if (btnMenu) btnMenu.className = tab === 'menu' ? activeClass : inactiveClass;
+      if (btnDelivery) btnDelivery.className = tab === 'delivery' ? activeClass : inactiveClass;
+      if (btnReservations) btnReservations.className = tab === 'reservations' ? activeClass : inactiveClass;
+      if (btnOrders) btnOrders.className = tab === 'orders' ? activeClass + " relative" : inactiveClass + " relative";
+
+      if (tab === 'menu') {
+        orderTypeMode = 'dine-in';
+        document.getElementById('custTabMenu').classList.remove('hidden');
+        updateCartHeader();
+      } else if (tab === 'delivery') {
+        orderTypeMode = 'delivery';
+        document.getElementById('custTabMenu').classList.remove('hidden');
+        document.getElementById('custTabDelivery').classList.remove('hidden');
+        renderDeliveryMenu();
+        updateCartHeader();
+      } else if (tab === 'reservations') {
+        document.getElementById('custTabReservations').classList.remove('hidden');
+      } else if (tab === 'orders') {
+        document.getElementById('custTabOrders').classList.remove('hidden');
+        renderCustomerLiveOrders();
+      }
+    }
+
+    function updateCartHeader() {
+      const headerTitle = document.getElementById('cartHeaderTitle');
+      const headerSub = document.getElementById('cartHeaderSub');
+      const headerBadge = document.getElementById('cartHeaderBadge');
+      const submitBtnText = document.getElementById('cartSubmitBtnText');
+
+      if (orderTypeMode === 'delivery') {
+        if (headerTitle) headerTitle.textContent = "Home Delivery Checkout";
+        if (headerSub) headerSub.textContent = "Dispatched via Express Courier";
+        if (headerBadge) {
+          headerBadge.textContent = "Delivery Order";
+          headerBadge.className = "text-xs font-mono px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 font-semibold";
+        }
+        if (submitBtnText) submitBtnText.textContent = "Dispatch Delivery Order";
+      } else {
+        if (headerTitle) headerTitle.textContent = "Table 04 Session";
+        if (headerSub) headerSub.textContent = "Order directly to kitchen KDS";
+        if (headerBadge) {
+          headerBadge.textContent = "Active Session";
+          headerBadge.className = "text-xs font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold";
+        }
+        if (submitBtnText) submitBtnText.textContent = "Send Order to Kitchen";
+      }
+    }
+
+    function renderDeliveryMenu() {
+      const grid = document.getElementById('deliveryMenuGrid');
+      const deliveryItems = menuItems.filter(item => item.deliveryAvailable);
+
+      grid.innerHTML = deliveryItems.map(item => `
+        <div class="glass-card rounded-2xl p-4 flex flex-col justify-between glass-card-hover ${!item.available ? 'opacity-60' : ''}">
+          <div>
+            <div class="flex justify-between items-start mb-2">
+              <span class="text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
+                <i class="fa-solid fa-truck-fast mr-1"></i> Delivery Ready
+              </span>
+              <span class="font-mono font-bold text-white text-sm">$${item.price.toFixed(2)}</span>
+            </div>
+            <h4 class="font-serif font-bold text-white text-base leading-snug">${item.name}</h4>
+            <p class="text-xs text-slate-400 mt-1 line-clamp-2">${item.desc}</p>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between">
+            <span class="text-[10px] ${item.available ? 'text-emerald-400' : 'text-red-400'}">
+              ${item.available ? '<i class="fa-solid fa-check text-[8px] mr-1"></i> Available' : 'Out of Stock'}
+            </span>
+            <button onclick="addToCart(${item.id})" ${!item.available ? 'disabled' : ''} class="gold-gradient-btn text-slate-950 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center">
+              <i class="fa-solid fa-plus mr-1"></i> Add to Delivery Cart
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function addToCart(itemId) {
+      const item = menuItems.find(i => i.id === itemId);
+      if (!item || !item.available) return;
+
+      const existing = customerCart.find(c => c.id === itemId);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        customerCart.push({ id: item.id, name: item.name, price: item.price, qty: 1 });
+      }
+
+      renderCart();
+      showToast(`Added ${item.name} to order`, 'success');
+    }
+
+    function updateCartQty(itemId, change) {
+      const existing = customerCart.find(c => c.id === itemId);
+      if (!existing) return;
+
+      existing.qty += change;
+      if (existing.qty <= 0) {
+        customerCart = customerCart.filter(c => c.id !== itemId);
+      }
+      renderCart();
+    }
+
+    function setTip(percent) {
+      activeTipPercent = percent;
+      renderCart();
+    }
+
+    function renderCart() {
+      const list = document.getElementById('cartItemList');
+      const subtotalEl = document.getElementById('cartSubtotal');
+      const taxEl = document.getElementById('cartTax');
+      const totalEl = document.getElementById('cartTotal');
+
+      if (customerCart.length === 0) {
+        list.innerHTML = `<p class="text-slate-500 italic text-center py-6">Your order cart is empty.</p>`;
+        if(subtotalEl) subtotalEl.textContent = '$0.00';
+        if(taxEl) taxEl.textContent = '$0.00';
+        if(totalEl) totalEl.textContent = '$0.00';
+        return;
+      }
+
+      let subtotal = 0;
+      list.innerHTML = customerCart.map(item => {
+        const itemTotal = item.price * item.qty;
+        subtotal += itemTotal;
+        return `
+          <div class="flex items-center justify-between bg-slate-900/60 p-2.5 rounded-xl border border-slate-800">
+            <div class="pr-2">
+              <p class="font-medium text-white text-xs">${item.name}</p>
+              <p class="text-[10px] text-brand-gold font-mono">$${item.price.toFixed(2)}</p>
+            </div>
+            <div class="flex items-center space-x-2">
+              <button onclick="updateCartQty(${item.id}, -1)" class="w-5 h-5 rounded bg-slate-800 text-slate-300 flex items-center justify-center font-bold text-xs hover:bg-slate-700">-</button>
+              <span class="font-bold text-xs text-white">${item.qty}</span>
+              <button onclick="updateCartQty(${item.id}, 1)" class="w-5 h-5 rounded bg-slate-800 text-slate-300 flex items-center justify-center font-bold text-xs hover:bg-slate-700">+</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      const tax = subtotal * 0.0825;
+      const tip = subtotal * (activeTipPercent / 100);
+      const total = subtotal + tax + tip;
+
+      if(subtotalEl) subtotalEl.textContent = `$${subtotal.toFixed(2)}`;
+      if(taxEl) taxEl.textContent = `$${tax.toFixed(2)}`;
+      if(totalEl) totalEl.textContent = `$${total.toFixed(2)}`;
+    }
+
+    function submitCustomerOrder() {
+      if (customerCart.length === 0) {
+        showToast('Cart is empty. Add items first.', 'warning');
+        return;
+      }
+
+      const isDelivery = orderTypeMode === 'delivery';
+      const address = isDelivery ? document.getElementById('delAddress').value : '';
+      const phone = isDelivery ? document.getElementById('delPhone').value : '';
+
+      if (isDelivery && (!address || !phone)) {
+        showToast('Please provide delivery address and phone number', 'warning');
+        return;
+      }
+
+      const newOrderId = 1040 + kitchenOrders.length + 3;
+      const destination = isDelivery ? `Delivery (${address.split(',')[0]})` : 'Table 04';
+
+      const newTicket = {
+        id: newOrderId,
+        table: destination,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timerSeconds: 0,
+        status: 'pending',
+        type: isDelivery ? 'Delivery' : 'Dine-In',
+        items: customerCart.map(c => ({ name: c.name, qty: c.qty, notes: isDelivery ? `Delivery to ${address}` : 'Customer App Order' }))
+      };
+
+      // Add to Kitchen Feed
+      kitchenOrders.unshift(newTicket);
+
+      // Deduct stock from Inventory
+      customerCart.forEach(cartItem => {
+        const inv = inventoryData.find(i => i.name.toLowerCase().includes(cartItem.name.toLowerCase()) || cartItem.name.toLowerCase().includes(i.name.toLowerCase()));
+        if (inv) inv.stock = Math.max(0, inv.stock - cartItem.qty);
+      });
+
+      // Update Revenue metrics
+      const subtotal = customerCart.reduce((acc, i) => acc + (i.price * i.qty), 0);
+      totalRevenue += subtotal;
+      totalOrdersCount += 1;
+
+      if (!isDelivery) {
+        const t04 = tablesData.find(t => t.id === 4);
+        if (t04) { t04.status = 'occupied'; t04.subtotal += subtotal; }
+      }
+
+      // Reset local cart
+      customerCart = [];
+      renderCart();
+
+      // Show indicator
+      document.getElementById('custActiveBadge').classList.remove('hidden');
+
+      showToast(isDelivery ? `Delivery Order #${newOrderId} Dispatched!` : `Order #${newOrderId} sent to Kitchen KDS!`, 'success');
+      logActivity(`Order #${newOrderId} (${isDelivery ? 'Delivery' : 'Table 04'}) placed`);
+    }
+
+    function handleReservationSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('resName').value;
+      const guests = document.getElementById('resGuests').value;
+      const time = document.getElementById('resTime').value;
+      const date = document.getElementById('resDate').value;
+      const area = document.getElementById('resSeatingArea').value;
+      const notes = document.getElementById('resSpecialNotes').value;
+
+      const resId = `RES-${Math.floor(1000 + Math.random() * 9000)}`;
+
+      customerReservations.unshift({
+        id: resId,
+        name,
+        guests,
+        date,
+        time,
+        area,
+        notes,
+        status: 'Confirmed'
+      });
+
+      showToast(`Reservation #${resId} Confirmed for ${name} (${guests} Guests) on ${date} at ${time}!`, 'success');
+      logActivity(`Table Reservation #${resId}: ${name} (${guests} guests at ${area})`);
+      
+      // Navigate to tracker tab to see reservation
+      showCustomerTab('orders');
+    }
+
+    function renderCustomerLiveOrders() {
+      const container = document.getElementById('customerLiveOrdersList');
+      const table04Orders = kitchenOrders.filter(o => o.table.includes('Table 04') || o.type === 'Delivery');
+
+      let contentHtml = '';
+
+      // Section 1: Pre-booked Table Reservations
+      if (customerReservations.length > 0) {
+        contentHtml += `<div class="space-y-2 mb-6"><h4 class="text-xs font-bold uppercase tracking-wider text-brand-gold">Pre-Booked Table Reservations</h4>`;
+        contentHtml += customerReservations.map(res => `
+          <div class="glass-card rounded-2xl p-4 border border-brand-gold/30 flex items-center justify-between">
+            <div class="space-y-1">
+              <div class="flex items-center space-x-2">
+                <span class="font-bold text-white text-sm">${res.name}</span>
+                <span class="text-[10px] font-mono bg-brand-gold/10 text-brand-gold border border-brand-gold/20 px-2 py-0.5 rounded">${res.id}</span>
+              </div>
+              <p class="text-xs text-slate-300"><i class="fa-solid fa-users mr-1 text-slate-400"></i> ${res.guests} Guests • <i class="fa-solid fa-location-dot mr-1 text-slate-400"></i> ${res.area}</p>
+              <p class="text-[11px] text-slate-400 font-mono"><i class="fa-regular fa-calendar mr-1"></i> ${res.date} at ${res.time}</p>
+              ${res.notes ? `<p class="text-[10px] text-slate-500 italic">Note: ${res.notes}</p>` : ''}
+            </div>
+            <span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full"><i class="fa-solid fa-circle-check mr-1"></i> ${res.status}</span>
+          </div>
+        `).join('');
+        contentHtml += `</div>`;
+      }
+
+      // Section 2: Active Kitchen Orders
+      contentHtml += `<h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Live Kitchen Orders</h4>`;
+
+      if (table04Orders.length === 0) {
+        contentHtml += `<p class="text-slate-500 italic text-center py-6">No active food orders placed yet.</p>`;
+      } else {
+        contentHtml += table04Orders.map(order => {
+          let statusBadge = '<span class="text-amber-400 bg-amber-400/10 px-2.5 py-1 rounded-full text-xs">Kitchen Prepping</span>';
+          if (order.status === 'ready') statusBadge = '<span class="text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full text-xs">Ready / Out for Delivery</span>';
+          if (order.status === 'pending') statusBadge = '<span class="text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-full text-xs">Received by Kitchen</span>';
+
+          return `
+            <div class="glass-card rounded-2xl p-5 border border-slate-800 space-y-3">
+              <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                <div>
+                  <span class="font-bold text-white font-mono text-sm">Order #${order.id} (${order.type || 'Dine-In'})</span>
+                  <span class="text-xs text-slate-500 ml-2">${order.time}</span>
+                </div>
+                ${statusBadge}
+              </div>
+              <div class="space-y-1 text-xs text-slate-300">
+                ${order.items.map(i => `<div class="flex justify-between"><span>${i.qty}x${i.name}</span><span class="text-slate-500">${i.notes}</span></div>`).join('')}
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      container.innerHTML = contentHtml;
+    }
+
+    // ------------------------------------------
+    // MODULE 2: WAITSTAFF / POS LOGIC
+    // ------------------------------------------
+    function renderFloorMap() {
+      const grid = document.getElementById('floorMapGrid');
+      grid.innerHTML = tablesData.map(table => {
+        let statusBg = 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400';
+        if (table.status === 'occupied') statusBg = 'bg-amber-500/10 border-amber-500/30 text-amber-400';
+        if (table.status === 'reserved') statusBg = 'bg-purple-500/10 border-purple-500/30 text-purple-400';
+
+        const isSelected = selectedPosTableId === table.id;
+
+        return `
+          <button onclick="selectPosTable(${table.id})" class="p-4 rounded-2xl border text-left flex flex-col justify-between transition-all ${statusBg} ${isSelected ? 'ring-2 ring-brand-gold scale-[1.02]' : ''}">
+            <div class="flex justify-between items-start">
+              <span class="font-serif font-bold text-white text-base">${table.name}</span>
+              <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded-md bg-obsidian-950">${table.status}</span>
+            </div>
+            <div class="mt-4 flex justify-between items-end text-xs">
+              <span class="text-slate-400"><i class="fa-solid fa-users mr-1"></i> ${table.seats} seats</span>
+              <span class="font-mono font-bold text-white">$${table.subtotal.toFixed(2)}</span>
+            </div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function selectPosTable(tableId) {
+      selectedPosTableId = tableId;
+      const t = tablesData.find(tbl => tbl.id === tableId);
+      if (!t) return;
+
+      document.getElementById('posSelectedTableTitle').textContent = `${t.name} Selection`;
+      const badge = document.getElementById('posTableStatusBadge');
+      badge.textContent = t.status.toUpperCase();
+      
+      renderFloorMap();
+      renderPosTableOrder();
+    }
+
+    function renderPosQuickItems() {
+      const container = document.getElementById('posQuickItemGrid');
+      container.innerHTML = menuItems.map(item => `
+        <button onclick="addPosItemToTable(${item.id})" class="p-2 bg-slate-900 border border-slate-800 hover:border-brand-gold rounded-xl text-left transition-colors">
+          <p class="text-xs font-medium text-white truncate">${item.name}</p>
+          <p class="text-[10px] text-brand-gold font-mono">$${item.price.toFixed(2)}</p>
+        </button>
+      `).join('');
+    }
+
+    function addPosItemToTable(itemId) {
+      const t = tablesData.find(tbl => tbl.id === selectedPosTableId);
+      const item = menuItems.find(m => m.id === itemId);
+      if (!t || !item) return;
+
+      t.status = 'occupied';
+      t.subtotal += item.price;
+
+      // Find or create active kitchen ticket for this table
+      let ticket = kitchenOrders.find(o => o.table === t.name && o.status !== 'ready');
+      if (!ticket) {
+        ticket = {
+          id: 1040 + kitchenOrders.length + 1,
+          table: t.name,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          timerSeconds: 0,
+          status: 'pending',
+          items: []
+        };
+        kitchenOrders.unshift(ticket);
+      }
+
+      ticket.items.push({ name: item.name, qty: 1, notes: 'POS Waitstaff' });
+
+      renderFloorMap();
+      renderPosTableOrder();
+      showToast(`Added ${item.name} to ${t.name}`, 'info');
+    }
+
+    function renderPosTableOrder() {
+      const list = document.getElementById('posTableItemsList');
+      const totalEl = document.getElementById('posBillTotal');
+      const t = tablesData.find(tbl => tbl.id === selectedPosTableId);
+
+      if (!t || t.subtotal === 0) {
+        list.innerHTML = `<p class="text-slate-500 italic text-center py-4">No active items billed to this table.</p>`;
+        totalEl.textContent = '$0.00';
+        return;
+      }
+
+      const ticket = kitchenOrders.find(o => o.table === t.name);
+      if (!ticket || ticket.items.length === 0) {
+        list.innerHTML = `<p class="text-slate-500 italic text-center py-4">No items recorded.</p>`;
+        totalEl.textContent = `$${t.subtotal.toFixed(2)}`;
+        return;
+      }
+
+      list.innerHTML = ticket.items.map(i => `
+        <div class="flex justify-between items-center bg-slate-900/80 p-2 rounded-lg border border-slate-800">
+          <span>1x ${i.name}</span>
+          <span class="text-slate-400 text-[10px]">${i.notes}</span>
+        </div>
+      `).join('');
+
+      totalEl.textContent = `$${t.subtotal.toFixed(2)}`;
+    }
+
+    function dispatchPosOrder() {
+      const t = tablesData.find(tbl => tbl.id === selectedPosTableId);
+      if (!t) return;
+
+      showToast(`Order dispatched to Kitchen KDS for ${t.name}`, 'success');
+      logActivity(`Waitstaff dispatched ticket for ${t.name}`);
+    }
+
+    function resetPosSelection() {
+      selectedPosTableId = 1;
+      renderFloorMap();
+      renderPosTableOrder();
+    }
+
+    // ------------------------------------------
+    // RECEIPT & SPLIT BILL MODAL LOGIC
+    // ------------------------------------------
+    function openReceiptModal() {
+      const t = tablesData.find(tbl => tbl.id === selectedPosTableId);
+      if (!t || t.subtotal === 0) {
+        showToast('Select an occupied table with items to print receipt', 'warning');
+        return;
+      }
+
+      document.getElementById('recTableNum').textContent = t.name;
+      document.getElementById('recSubtotal').textContent = `$${t.subtotal.toFixed(2)}`;
+      const tax = t.subtotal * 0.0825;
+      const total = t.subtotal + tax;
+      
+      document.getElementById('recTax').textContent = `$${tax.toFixed(2)}`;
+      document.getElementById('recTotal').textContent = `$${total.toFixed(2)}`;
+
+      // Render receipt items
+      const ticket = kitchenOrders.find(o => o.table === t.name);
+      const itemsList = document.getElementById('recItemsList');
+      if (ticket) {
+        itemsList.innerHTML = ticket.items.map(i => `
+          <div class="flex justify-between">
+            <span>1x ${i.name}</span>
+            <span>--</span>
+          </div>
+        `).join('');
+      } else {
+        itemsList.innerHTML = `<div class="flex justify-between"><span>Dining Items</span><span>$${t.subtotal.toFixed(2)}</span></div>`;
+      }
+
+      splitPeopleCount = 1;
+      updateSplitAmount();
+
+      document.getElementById('receiptModal').classList.remove('hidden');
+    }
+
+    function closeReceiptModal() {
+      document.getElementById('receiptModal').classList.add('hidden');
+    }
+
+    function adjustSplit(delta) {
+      splitPeopleCount = Math.max(1, splitPeopleCount + delta);
+      document.getElementById('splitCount').textContent = splitPeopleCount;
+      updateSplitAmount();
+    }
+
+    function updateSplitAmount() {
+      const t = tablesData.find(tbl => tbl.id === selectedPosTableId);
+      if (!t) return;
+      const tax = t.subtotal * 0.0825;
+      const grandTotal = t.subtotal + tax;
+      const perPerson = grandTotal / splitPeopleCount;
+      document.getElementById('splitAmount').textContent = `$${perPerson.toFixed(2)}`;
+    }
+
+    function simulatePrintReceipt() {
+      showToast('Receipt printed to POS Thermal Printer', 'success');
+      closeReceiptModal();
+    }
+
+    // ------------------------------------------
+    // MODULE 3: KITCHEN DISPLAY LOGIC (KDS)
+    // ------------------------------------------
+    function updateKdsTimers() {
+      kitchenOrders.forEach(ticket => {
+        if (ticket.status !== 'ready') {
+          ticket.timerSeconds += 1;
+        }
+      });
+
+      // Update timer displays if Kitchen module visible
+      if (currentRole === 'kitchen') {
+        renderKdsTickets();
+      }
+    }
+
+    function renderKdsTickets() {
+      const grid = document.getElementById('kdsTicketsGrid');
+      const countEl = document.getElementById('kdsTicketCount');
+      if (countEl) countEl.textContent = `${kitchenOrders.length} Active Tickets`;
+
+      if (kitchenOrders.length === 0) {
+        grid.innerHTML = `<div class="col-span-3 text-slate-500 italic py-12 text-center">No open kitchen tickets in queue.</div>`;
+        return;
+      }
+
+      grid.innerHTML = kitchenOrders.map(ticket => {
+        const mins = Math.floor(ticket.timerSeconds / 60);
+        const secs = ticket.timerSeconds % 60;
+        const formattedTimer = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        const isUrgent = mins >= 10;
+
+        let statusBorder = 'border-slate-800';
+        if (ticket.status === 'prepping') statusBorder = 'border-amber-500/50';
+        if (ticket.status === 'ready') statusBorder = 'border-emerald-500/50';
+        if (isUrgent) statusBorder += ' urgent-ticket';
+
+        return `
+          <div class="glass-card rounded-2xl p-5 border ${statusBorder} flex flex-col justify-between space-y-4">
+            <div>
+              <div class="flex justify-between items-start border-b border-slate-800 pb-3">
+                <div>
+                  <h3 class="font-serif font-bold text-white text-lg">${ticket.table}</h3>
+                  <p class="text-[10px] text-slate-400 font-mono">Order #${ticket.id} • ${ticket.time}</p>
+                </div>
+                <div class="text-right">
+                  <span class="font-mono font-bold text-sm ${isUrgent ? 'text-red-400' : 'text-brand-gold'}">${formattedTimer}</span>
+                  <p class="text-[9px] uppercase tracking-wider text-slate-500">Timer</p>
+                </div>
+              </div>
+
+              <!-- Item Checklist -->
+              <div class="mt-4 space-y-2 text-xs">
+                ${ticket.items.map(item => `
+                  <div class="flex items-start justify-between bg-slate-900/60 p-2 rounded-lg border border-slate-800/80">
+                    <div>
+                      <span class="font-bold text-white mr-1.5">${item.qty}x</span>
+                      <span class="text-slate-200">${item.name}</span>
+                    </div>
+                    <span class="text-[10px] text-brand-gold bg-brand-gold/10 px-1.5 py-0.5 rounded">${item.notes}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+            <!-- Action Controls -->
+            <div class="pt-3 border-t border-slate-800 flex items-center justify-between">
+              ${ticket.status === 'pending' ? `
+                <button onclick="updateTicketStatus(${ticket.id}, 'prepping')" class="w-full bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold py-2 rounded-xl text-xs border border-amber-500/30 transition-colors">
+                  <i class="fa-solid fa-fire-burner mr-1"></i> Start Prep
+                </button>
+              ` : ''}
+
+              ${ticket.status === 'prepping' ? `
+                <button onclick="updateTicketStatus(${ticket.id}, 'ready')" class="w-full gold-gradient-btn text-slate-950 font-bold py-2 rounded-xl text-xs shadow-md">
+                  <i class="fa-solid fa-circle-check mr-1"></i> Mark Order Ready
+                </button>
+              ` : ''}
+
+              ${ticket.status === 'ready' ? `
+                <span class="text-xs font-bold text-emerald-400 flex items-center justify-center w-full py-1.5 bg-emerald-500/10 rounded-xl">
+                  <i class="fa-solid fa-check-double mr-1.5"></i> Order Ready for Server
+                </span>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function updateTicketStatus(ticketId, newStatus) {
+      const ticket = kitchenOrders.find(t => t.id === ticketId);
+      if (!ticket) return;
+
+      ticket.status = newStatus;
+      renderKdsTickets();
+
+      showToast(`Order #${ticketId} status updated to ${newStatus.toUpperCase()}`, 'info');
+      logActivity(`KDS: Ticket #${ticketId} marked ${newStatus}`);
+    }
+
+    // ------------------------------------------
+    // MODULE 4: ADMIN DASHBOARD LOGIC
+    // ------------------------------------------
+    function renderAdminDashboard() {
+      // Metric Counters
+      document.getElementById('adminMetricRevenue').textContent = `$${totalRevenue.toFixed(2)}`;
+      document.getElementById('adminMetricOrders').textContent = totalOrdersCount;
+
+      renderRevenueChart();
+      renderAdminInventory();
+      renderAdminMenuTable();
+    }
+
+    function renderRevenueChart() {
+      const chart = document.getElementById('adminRevenueChart');
+      const dataPoints = [
+        { hour: '11 AM', val: 320 },
+        { hour: '12 PM', val: 680 },
+        { hour: '1 PM', val: 940 },
+        { hour: '2 PM', val: 510 },
+        { hour: '3 PM', val: 290 },
+        { hour: '4 PM', val: 410 },
+        { hour: '5 PM', val: 780 }
+      ];
+
+      const maxVal = 1000;
+      chart.innerHTML = dataPoints.map(dp => {
+        const heightPercent = (dp.val / maxVal) * 100;
+        return `
+          <div class="flex-1 flex flex-col items-center h-full justify-end group">
+            <span class="text-[10px] text-brand-gold opacity-0 group-hover:opacity-100 transition-opacity font-mono">$${dp.val}</span>
+            <div style="height: ${heightPercent}%" class="w-full bg-gradient-to-t from-brand-700 to-brand-gold rounded-t-lg transition-all duration-500 hover:brightness-125"></div>
+            <span class="text-[10px] text-slate-500 mt-2">${dp.hour}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderAdminInventory() {
+      const container = document.getElementById('adminInventoryList');
+      container.innerHTML = inventoryData.map(item => {
+        const isLow = item.stock <= item.min;
+        return `
+          <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 text-xs">
+            <div>
+              <p class="font-medium text-white">${item.name}</p>
+              <p class="text-[10px] text-slate-500">Min threshold: ${item.min} ${item.unit}</p>
+            </div>
+            <div class="text-right">
+              <span class="font-mono font-bold ${isLow ? 'text-red-400' : 'text-emerald-400'}">${item.stock} ${item.unit}</span>
+              ${isLow ? '<span class="block text-[9px] text-red-400 font-bold uppercase">Low Stock</span>' : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderAdminMenuTable() {
+      const tbody = document.getElementById('adminMenuTableBody');
+      tbody.innerHTML = menuItems.map(item => `
+        <tr class="hover:bg-slate-900/40">
+          <td class="p-3 font-semibold text-white">${item.name}</td>
+          <td class="p-3 capitalize text-slate-400">${item.category}</td>
+          <td class="p-3 font-mono text-brand-gold">$${item.price.toFixed(2)}</td>
+          <td class="p-3">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${item.available ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}">
+              ${item.available ? 'Active' : 'Disabled'}
+            </span>
+          </td>
+          <td class="p-3 text-right">
+            <button onclick="toggleMenuItemAvailability(${item.id})" class="text-xs text-slate-400 hover:text-white underline">
+              Toggle Status
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function toggleMenuItemAvailability(itemId) {
+      const item = menuItems.find(m => m.id === itemId);
+      if (!item) return;
+
+      item.available = !item.available;
+      renderAdminMenuTable();
+      showToast(`${item.name} status updated`, 'info');
+    }
+
+    function triggerInventoryRestock() {
+      inventoryData.forEach(item => {
+        item.stock += 20;
+      });
+      renderAdminInventory();
+      showToast('All ingredient stocks replenished by +20 units', 'success');
+    }
+
+    function toggleAddMenuModal() {
+      showToast('Add Menu Item feature available in full version', 'info');
+    }
+
+    function toggleUserDropdown() {
+      const dropdown = document.getElementById('userDropdown');
+      if (dropdown) {
+        dropdown.classList.toggle('hidden');
+      }
+    }
+
+    function toggleNotifications() {
+      const dropdown = document.getElementById('notifDropdown');
+      if (dropdown) {
+        dropdown.classList.toggle('hidden');
+      }
+    }
+
+    function closeLoginModal() {
+      const modal = document.getElementById('loginModal');
+      if (modal) {
+        modal.classList.add('hidden');
+      }
+    }
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+      const userBtn = e.target.closest('button[onclick*="toggleUserDropdown"]');
+      const userMenu = document.getElementById('userDropdown');
+      if (!userBtn && userMenu && !userMenu.contains(e.target)) {
+        userMenu.classList.add('hidden');
+      }
+
+      const notifBtn = e.target.closest('#notifBtn');
+      const notifMenu = document.getElementById('notifDropdown');
+      if (!notifBtn && notifMenu && !notifMenu.contains(e.target)) {
+        notifMenu.classList.add('hidden');
+      }
+    });
+
+    // ------------------------------------------
+    // UTILITY: NOTIFICATIONS & TOASTS
+    // ------------------------------------------
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+
+      let icon = 'fa-info-circle text-blue-400';
+      if (type === 'success') icon = 'fa-check-circle text-emerald-400';
+      if (type === 'warning') icon = 'fa-exclamation-triangle text-amber-400';
+
+      toast.className = `glass-card border border-brand-gold/30 px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-3 pointer-events-auto transform transition-all duration-300 text-xs text-slate-200`;
+      toast.innerHTML = `
+        <i class="fa-solid ${icon} text-sm"></i>
+        <span>${message}</span>
+      `;
+
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    function logActivity(text) {
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      activityLog.unshift({ time, text });
+      renderNotifications();
+    }
+
+    function renderNotifications() {
+      const list = document.getElementById('notifList');
+      if (!list) return;
+
+      list.innerHTML = activityLog.map(act => `
+        <div class="p-2 rounded-lg bg-slate-900/80 border border-slate-800/60">
+          <p class="text-white font-medium">${act.text}</p>
+          <span class="text-[9px] text-slate-500 font-mono">${act.time}</span>
+        </div>
+      `).join('');
+    }
+
+    function clearNotifications() {
+      activityLog = [];
+      renderNotifications();
+    }
+  </script>
+</body>
+</html>
